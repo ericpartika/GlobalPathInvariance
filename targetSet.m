@@ -1,4 +1,4 @@
-function [bool] = targetSet(x)
+1function [bool] = targetSet(x)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 x1 = x(1); % x
@@ -8,7 +8,7 @@ x4 = x(4); % delta
 
 % adjust these thresholds to expand target set
 threshhold = 0.05; %5cm
-angleThreshhold = 0.02 %approx 1deg
+angleThreshhold = 0.2 %approx 12deg
 
 load('targetSet.mat');
 

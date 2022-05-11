@@ -55,3 +55,9 @@ rectangle('Position',U(1,:),'FaceColor',[1 0 0])
 rectangle('Position',U(2,:),'FaceColor',[1 0 0])
 rectangle('Position',U(3,:),'FaceColor',[1 0 0])
 
+figure(2)
+hold on
+plot(t, sin(t))
+for i = 1:10:1999
+    quiver(x_all(1,i), x_all(2,i), (cos(x_all(3,i))), (sin(x_all(3,i))), 0)
+end
