@@ -22,4 +22,7 @@ The flow map and set are described by C.m and f.m. The flow set spans all of R^4
 
 This file is a scratch work space for visualizing everything. If you run it it will produce two figures. Figure 1 shows the vehicle position, unsafe set, and target set. Figure 2 shows the target set with vectors representing x(3) or θ, the orientation of the vehicle. 
 
+## purepusuit.m
+
+This is a control algortihm for following predefined paths. It has be tested on sine waves and S-curves with constant speed. Code is still a little messy but it is able to track trajectories quite well. 
 
