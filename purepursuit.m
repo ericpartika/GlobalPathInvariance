@@ -3,18 +3,18 @@ close all
 
 %% path generation
 %%% s curve
-% t = 0:0.01:10;
-% rad = 50;
-% xpath = t;
-% a = 5;
-% k = 1;
-% ypath = 5*(1./(1+exp(-k.*(xpath-a))));
+t = 0:0.01:10;
+rad = 50;
+xpath = t;
+a = 2;
+k = 1;
+ypath = 4 - (5*(1./(1+exp(-k.*(xpath-a)))));
 
 %%% sine wave
-th = 0:pi/100:10*pi;
-rad = 50;
-xpath = th;
-ypath = 5*sin(th/4);
+% th = 0:pi/100:10*pi;
+% rad = 50;
+% xpath = th;
+% ypath = 5*sin(th/4);
 
 figure(1)
 hold on
@@ -26,15 +26,18 @@ hold off
 u = [0.1, 0]'; % u = (v, omega)
 
 z = [0, 0, 0, 0;
-     0, 0, deg2rad(0), 0]'; % z = (x, y, theta, zeta)
+     0, 4, deg2rad(0), 0]'; % z = (x, y, theta, zeta)
 
 L = 0.3;
 lr = L/2;
 
+Kp = 0.7;
+dt = 0.01;
+
 
 %% controls
 
-for j = 1:30
+for j = 1:length(xpath)
     % find closest tp in range
     kdd = 15;
     ld = kdd*u(1);
@@ -48,7 +51,7 @@ for j = 1:30
 %     bwy = z(2, end) - lr*sin(z(3, end));
     bwx = z(1,end);
     bwy = z(2, end);
-    ispan = j*10:length(xpath);
+    ispan = j:length(xpath);
     for i = ispan
         d = sqrt( ( bwx-xpath(i) )^2 + ( bwy-ypath(i) )^2 );
         %     a = atan2(ypath(i) - bwy,xpath(i) -bwx);
@@ -67,7 +70,7 @@ for j = 1:30
     % alpha=atan2(yg - bwy,xg - bwx);
     % delta = atan((2*L*sin(alpha))/(min));
     delta = -atan2((2*L*sin(alpha)),(ld));
-    z(4,end) = delta;
+%     z(4,end) = delta;
 
     tspan = 1:10;
 
@@ -80,13 +83,13 @@ for j = 1:30
         thetadot = u(1) * (tan(z(4, end)))/(L);
         omega = u(2);
 
-        zdot = [xdot, ydot, thetadot, omega]';
+        zdot = [xdot*dt, ydot*dt, thetadot*dt, omega*dt]';
 
         z = [z, z(:, end)+zdot];
 
-        % p controller
-        %     e = delta - z(4, end);
-        %     u(2) = Kp * e;
+%         p controller
+            e = delta - z(4, end);
+            u(2) = Kp * e;
 
         %brake
 %         derr = sqrt( ( bwx-xg )^2 + ( bwy-yg )^2 );

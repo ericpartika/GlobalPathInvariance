@@ -14,7 +14,7 @@ Returns true if state is in target set within some threshold. The target set can
 
 Returns true if value is in unsafe set. The unsafe set contains three squares of width 0.5(50cm) with bottom left corners located at (1,2), (3,2.5), and (4,1). 
 
-# Flow map and set
+## Flow map and set
 
 The flow map and set are described by C.m and f.m. The flow set spans all of R^4. The flow map contains the differential equations that govern the evolution of the state.
 
