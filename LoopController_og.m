@@ -6,17 +6,20 @@ close all
 
 %% System Parameters
 v = 0.1; %%% Not the linear velocity input but the fixed speed
-k1 = 10; %
-k2 = 10;
-k3 = 10;%
-k4 = 100;
-k5 = 100;
-L=0.2;
-r=5; %% radius of the circle to follow
+
+   K = 1*[  10   60    180];
+
+k1 = K(1); %
+k2 = K(2);
+k3 = K(3);%
+k4 = 11;
+k5 = 6;
+L=0.3;
+r=1; %% radius of the circle to follow
 
 %%
 %%% Initial Conditions
-X1_0= 0 %% x-position
+X1_0= 1.5 %% x-position
 X2_0= 0;  %% y-position
 X3_0=pi/2; %% car orientation
 X4_0=0;    %% Wheel angle

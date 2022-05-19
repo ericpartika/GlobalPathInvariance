@@ -6,17 +6,37 @@ close all
 
 %% System Parameters
 v = 0.1; %%% Not the linear velocity input but the fixed speed
-k1 = 10; %
-k2 = 10;
-k3 = 10;%
-k4 = 100;
-k5 = 100;
-L=0.2;
-r=5; %% radius of the circle to follow
+const_a = 3;
+k_int = 0.5;
+
+k1 = 3; %
+k2 = 15*const_a;
+k3 = 15*const_a;%
+k4 = 10;
+k5 =  10;
+L=0.27;
+r=1.5; %% radius of the circle to follow
+
+udp = udpport;
+
+%% Instantiate client object to run Motive API commands
+% https://optitrack.com/software/natnet-sdk/
+
+% Create Motive client object
+dllPath = fullfile('c:','Users','adakhtar', 'Desktop', 'NatNetSDK','lib','x64','NatNetML.dll');
+assemblyInfo = NET.addAssembly(dllPath); % Add API function calls
+theClient = NatNetML.NatNetClientML(0);
+
+% Create connection to localhost, data is now being streamed through client object
+HostIP = '127.0.0.1';
+theClient.Initialize(HostIP, HostIP); 
+
+Drone_ID = 1;
+
 
 %%
 %%% Initial Conditions
-X1_0= 0 %% x-position
+X1_0= 1; %% x-position
 X2_0= 0;  %% y-position
 X3_0=pi/2; %% car orientation
 X4_0=0;    %% Wheel angle
@@ -24,14 +44,15 @@ X5_0=0; %% Fictitious state and we can always initialize it with zero
 X6_0=0; %% Fictitious state and we can always initialize it with zero
 
 v_input = 0;
+steering_angle = 0;
 
 % Initial condition Vector
 x0 = [X1_0;X2_0;X3_0;X4_0;X5_0;X6_0]
 
 
 % Simulation time
-Tmax = 60;  % End point
-dt =0.01; % Time step
+Tmax = 12;  % End point
+dt =0.05; % Time step
 T = 0:dt:Tmax; % Time vector
 
 % Simulation setup
@@ -65,10 +86,32 @@ x3 = x3_Old;
 x4 = x4_Old;
 x5 = x5_Old;
 x6 = x6_Old;
+vel = 120;
 
+pause(1)
+
+xi1_old = 0;
 
 for i=1:length(T)-1
     %% Transformed states
+
+    [DronePos] = GetDronePosition(theClient, Drone_ID);
+
+    x1 = DronePos(2)
+    x2 = DronePos(4)
+
+%     x3_Old = x3;
+    x3 = DronePos(6);
+    if(x3 < 0)
+        x3 = x3 + 2*pi;
+    end
+%     if(abs(x3 - x3_Old))
+%         
+%     end
+
+%     x3_DEG = x3*(180/pi)
+
+    x4 = steering_angle;
 
 xi1 = - r^2 + x1^2 + x2^2;
 xi2 = 2*(v + x5)*(x1*cos(x3) + x2*sin(x3));
@@ -97,13 +140,14 @@ eta3_plot(i) = eta3;
     %%% Control inputs
     D=[Lg1Lf2P Lg2Lf2P;Lg1Lf2S Lg2Lf2S];
     M=inv(D);
-    %det_d=det(D);
+%     det_d=det(D)
     %v_tang = -k4*(eta2-0.5)-k5*(eta3); %%working controller for a constant (takes 1 or 2 min to execute)
 
+    xi1_intg = xi1_old + xi1*dt;
 
-    v_tang = -k4*(eta2-0.5)-k5*(eta3); % Trangential controller
+    v_tang = -k4*(eta2-0.1)-k5*(eta3); % Trangential controller
 
-    v_tran=-k1*xi1-k2*xi2-k3*xi3;  % Transversal controller 
+    v_tran=-k1*xi1-k2*xi2-k3*xi3 -k_int*xi1_intg;  % Transversal controller 
 
     u=M*[-Lf3P+v_tang;-Lf3S+v_tran];
     u1=u(1);
@@ -114,62 +158,82 @@ eta3_plot(i) = eta3;
 x6 = x6_Old + u2*dt;
 x5 = x5_Old + dt*x6;
 v_input = x5 + v;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-saturator = 1;
+% saturator = 1;
+% 
+% if u1 > saturator 
+%     u1 =saturator ;
+% end
+% 
+% if u1 < -saturator 
+%     u1 =-saturator ;
+% end
+% 
+% if v_input > saturator 
+%     v_input =saturator ;
+% end
+% 
+% if v_input < -saturator 
+%     v_input =-saturator ;
+% end
 
-if u1 > saturator 
-    u1 =saturator ;
+steering_angle = 1*steering_angle + u1*dt;
+
+% steering_angle = steering_angle*2;
+u1
+
+if(steering_angle < -0.7)
+    steering_angle = -0.7;
+elseif(steering_angle > 0.35)
+    steering_angle = 0.35;
 end
-
-if u1 < -saturator 
-    u1 =-saturator ;
-end
-
-if v_input > saturator 
-    v_input =saturator ;
-end
-
-if v_input < -saturator 
-    v_input =-saturator ;
-end
-
 u1_plot(i) = u1;
 u2_plot(i) = u2;
 
 
 % The system (Unicycle)   
-    x1 = x1_Old + dt*( v_input *cos(x3) );
-    x2 = x2_Old + dt*( v_input*sin(x3) );
-    x3 = x3_Old + dt*( (v_input/L)*tan(x4) );
-    x4 = x4_Old + u1*dt;
-% % % %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %      
-%      x5 = x5_Old + x6*dt; %%% Fictitius state
-%      x6 = x6_Old + u2*dt; %%% Fictitius state
+%     x1 = x1_Old + dt*( v_input *cos(x3) );
+%     x2 = x2_Old + dt*( v_input*sin(x3) );
+%     x3 = x3_Old + dt*( (v_input/L)*tan(x4) );
+%     x4 = x4_Old + u1*dt;
 
     
     %%% Making the state vector, that might be helpful for the debugging
     %%% purposes
     x = [x1;x2;x3;x4;x5;x6];
    
-    x_Old = x; %%% At the end of the an iteration the current values become the old values
-    x1_Old = x_Old(1);
-    x2_Old = x_Old(2);
-    x3_Old = x_Old(3);
-    x4_Old = x_Old(4);
-    x5_Old = x_Old(5);
-    x6_Old = x_Old(6);
+%     x_Old = x; %%% At the end of the an iteration the current values become the old values
+%     x1_Old = x_Old(1);
+%     x2_Old = x_Old(2);
+%     x3_Old = x_Old(3);
+%     x4_Old = x_Old(4);
+%     x5_Old = x_Old(5);
+%     x6_Old = x_Old(6);
     
     v_input_Old = v_input;
+    xi1_old = xi1;
     
     %%% Saving the current values of the state to the full state matrix,
     %%% that might be useful for plotting purposes
     x_all(:,i+1) = x; 
-    
+
+
+    %% Send Controls
+    if(i>50)
+        vel = 90;
+    end
+%     input = [round(steering_angle*180/pi)+40, 120-(v_input*20)];
+    input = [round(steering_angle*180/pi)+40, vel];
+    input
+    write(udp, input, 'uint8', '192.168.2.104', 10002);
+    pause(dt);
     
    end
+
+write(udp, [40,0], 'uint8', '192.168.2.104', 10002);
 
 %% Plotting
 
