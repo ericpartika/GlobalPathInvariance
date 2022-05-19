@@ -7,7 +7,7 @@ close all
 %% System Parameters
 v = 0.1; %%% Not the linear velocity input but the fixed speed
 const_a = 3;
-k_int = 0.5;
+k_int = 1;
 
 k1 = 3; %
 k2 = 15*const_a;
@@ -58,7 +58,7 @@ T = 0:dt:Tmax; % Time vector
 % Simulation setup
 x_all = zeros(size(x0,1),length(T));  % Intialization of a matrix to save all the values of the states 
 x_Old = x0; % Giving x0 as a the name of an old state to use it in the discretized equations
-x_all(:,1) = x0; % Saving the initial state in the full state matrix
+% x_all(:,1) = x0; % Saving the initial state in the full state matrix
 xi1_plot = zeros(1,length(T));
 xi2_plot = zeros(1,length(T));
 xi3_plot = zeros(1,length(T));
@@ -92,7 +92,7 @@ pause(1)
 
 xi1_old = 0;
 
-for i=1:length(T)-1
+for i=1:length(T)
     %% Transformed states
 
     [DronePos] = GetDronePosition(theClient, Drone_ID);
@@ -162,31 +162,15 @@ v_input = x5 + v;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-% saturator = 1;
-% 
-% if u1 > saturator 
-%     u1 =saturator ;
-% end
-% 
-% if u1 < -saturator 
-%     u1 =-saturator ;
-% end
-% 
-% if v_input > saturator 
-%     v_input =saturator ;
-% end
-% 
-% if v_input < -saturator 
-%     v_input =-saturator ;
-% end
+
 
 steering_angle = 1*steering_angle + u1*dt;
 
 % steering_angle = steering_angle*2;
 u1
 
-if(steering_angle < -0.7)
-    steering_angle = -0.7;
+if(steering_angle < -0.35)
+    steering_angle = -0.35;
 elseif(steering_angle > 0.35)
     steering_angle = 0.35;
 end
@@ -218,7 +202,7 @@ u2_plot(i) = u2;
     
     %%% Saving the current values of the state to the full state matrix,
     %%% that might be useful for plotting purposes
-    x_all(:,i+1) = x; 
+    x_all(:,i) = x; 
 
 
     %% Send Controls
@@ -249,7 +233,7 @@ lambda = -pi:0.01:pi;
     xlabel('x_{1}')
     ylabel('x_{2}')
     %%% displaying the initial marker
-    plot(x0(1), x0(2), 'bo', 'MarkerSize', 10, 'MarkerFaceColor', 'red');
+    plot(x_all(1,1), x_all(2,1), 'bo', 'MarkerSize', 10, 'MarkerFaceColor', 'red');
     plot(x_all(1,:), x_all(2,:), 'r','color','red','linewidth',2);
     grid on;
 hold off;
@@ -278,5 +262,9 @@ xlabel('t(sec)')
 ylabel('Magnitude of the control input')
 grid on;
 legend('u_2')
+
+date = datestr(now, 'dd_mm_yy_HH_MM');
+
+save(['Logs/',date, '.mat'], 'i', 'k1', 'k2', 'k3', 'x_all', 'u1_plot', 'u2_plot', 'dt', 'eta1_plot', 'eta2_plot', 'eta3_plot')
 
 

@@ -7,6 +7,8 @@ close all
 %% System Parameters
 v = 0.1; %%% Not the linear velocity input but the fixed speed
 const_a = 3;
+k_int = 0.5;
+
 k1 = 3; %
 k2 = 15*const_a;
 k3 = 15*const_a;%
@@ -49,7 +51,7 @@ x0 = [X1_0;X2_0;X3_0;X4_0;X5_0;X6_0]
 
 
 % Simulation time
-Tmax = 8;  % End point
+Tmax = 12;  % End point
 dt =0.05; % Time step
 T = 0:dt:Tmax; % Time vector
 
@@ -141,11 +143,11 @@ eta3_plot(i) = eta3;
 %     det_d=det(D)
     %v_tang = -k4*(eta2-0.5)-k5*(eta3); %%working controller for a constant (takes 1 or 2 min to execute)
 
-    xi1_intg = xi1_old + xi*dt;
+    xi1_intg = xi1_old + xi1*dt;
 
     v_tang = -k4*(eta2-0.1)-k5*(eta3); % Trangential controller
 
-    v_tran=-k1*xi1-k2*xi2-k3*xi3;  % Transversal controller 
+    v_tran=-k1*xi1-k2*xi2-k3*xi3 -k_int*xi1_intg;  % Transversal controller 
 
     u=M*[-Lf3P+v_tang;-Lf3S+v_tran];
     u1=u(1);
@@ -212,6 +214,7 @@ u2_plot(i) = u2;
 %     x6_Old = x_Old(6);
     
     v_input_Old = v_input;
+    xi1_old = xi1;
     
     %%% Saving the current values of the state to the full state matrix,
     %%% that might be useful for plotting purposes
@@ -275,5 +278,9 @@ xlabel('t(sec)')
 ylabel('Magnitude of the control input')
 grid on;
 legend('u_2')
+
+date = datestr(now, 'dd/mm/yy-HH:MM')
+
+save(date, i, k1, k2, k3, x_all, u1_plot, u2_plot, dt, eta1_plot, eta2_plot, eta3_plot)
 
 
