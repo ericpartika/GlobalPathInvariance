@@ -5,5 +5,5 @@ function [value discrete] = Ncircle(x)
 % Description: Neighborhood of curve
 % Return 0 if outside of C and 1 if inside C
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-value = (2.5) < sqrt( (x(1))^2 + (x(2))^2 );
+value = (1) < sqrt( (x(1))^2 + (x(2))^2 );
 end
