@@ -81,16 +81,25 @@ x6_Old = x6;
 v_input_Old = v_input;
 xi1_old = 0;
 
+lowpass_gain = 0.3;
+
 %% Contol Loop
 for i=1:length(T)
     % get measurments
+    x1_Old = x1;
+    x2_Old = x2;
+    x3_Old = x3;
+    
     [DronePos] = GetDronePosition(theClient, Drone_ID);
-    x1 = DronePos(2);
-    x2 = DronePos(4);
-    x3 = DronePos(6);
-    if(x3 < 0)
-        x3 = x3 + 2*pi;
+    x1m = DronePos(2); % x
+    x2m = DronePos(4); % y
+    x3m = DronePos(6); % theta
+    if(x3m < 0)
+        x3m = x3m + 2*pi;
     end
+    x1 = x1_Old*lowpass_gain + (1-lowpass_gain)*x1m;
+    x2 = x2_Old*lowpass_gain + (1-lowpass_gain)*x2m;
+    x3 = x3_Old*lowpass_gain + (1-lowpass_gain)*x3m;
     x4 = steering_angle;
 
     % Transformed states
