@@ -82,7 +82,7 @@ v_input_Old = v_input;
 xi1_old = 0;
 
 % path generation
-load('motionplanCircle.mat');
+load('motionplanCircle2.mat');
 xpath = motionplan(3,:);
 ypath = motionplan(4,:);
 
@@ -107,10 +107,10 @@ for i=1:length(T)
 
         if( mod(i, 10) == 0)
             % find closest tp in range
-            kdd = 10;
+            kdd = 5;
             ld = kdd*0.1;
-            tp_max = ld+0.2;
-            tp_min = ld-0.2;
+            tp_max = ld+0.1;
+            tp_min = ld-0.1;
             min = ld+2;
             xg = 0;
             yg = 0;
@@ -136,7 +136,7 @@ for i=1:length(T)
             % steering angle
             delta = -atan2((2*L*sin(alpha)),(ld));
 
-            tspan = 1:10;
+            tspan = 1:3;
 
             for t = tspan
                 steering_angle = delta;
@@ -149,14 +149,18 @@ for i=1:length(T)
 
                 % Send Controls
                 if(i>50)
-                    vel = 90;
+                    vel = 110;
                 end
                 %     input = [round(steering_angle*180/pi)+40, 120-(v_input*20)];
                 input = [round(steering_angle*180/pi)+40, vel];
-                write(udp, input, 'uint8', '192.168.2.104', 10002);
+                write(udp, input, 'uint8', '192.168.2.101', 10002);
 
                 % Loop at 10ms
                 pause(0.1);
+                q = NCircle(x);
+                if(q == 1)
+                    break
+                end
             end
 
         end
@@ -165,6 +169,7 @@ for i=1:length(T)
     else
         if(switchpoint == 0)
             switchpoint = i;
+            
         end
 
 
@@ -225,11 +230,11 @@ for i=1:length(T)
 
         % Send Controls
         if(i>50)
-            vel = 90;
+            vel = 110;
         end
         %     input = [round(steering_angle*180/pi)+40, 120-(v_input*20)];
         input = [round(steering_angle*180/pi)+40, vel];
-        write(udp, input, 'uint8', '192.168.2.104', 10002);
+        write(udp, input, 'uint8', '192.168.2.101', 10002);
 
         % Loop at 5ms
         pause(dt);
@@ -237,7 +242,7 @@ for i=1:length(T)
 end
 
 % stop car
-write(udp, [40,0], 'uint8', '192.168.2.104', 10002);
+write(udp, [40,0], 'uint8', '192.168.2.101', 10002);
 
 %% Plotting
 

@@ -17,7 +17,7 @@ L=0.3;
 %%% Initial Conditions
 X1_0= 0; %% x-position
 X2_0= 0;  %% y-position
-X3_0=pi; %% car orientation
+X3_0=0; %% car orientation
 X4_0=0;    %% Wheel angle
 X5_0=0; %% Fictitious state and we can always initialize it with zero
 X6_0=0; %% Fictitious state and we can always initialize it with zero
@@ -76,7 +76,7 @@ ang0 = 0;
 accel = 0;
 
 % path generation
-load('motionplanCircle.mat');
+load('motionplanCircle2.mat');
 xpath = motionplan(3,:);
 ypath = motionplan(4,:);
 
@@ -95,7 +95,7 @@ for i=1:length(T)-1
         if( mod(i, 10) == 0)
 
             % find closest tp in range
-            kdd = 10;
+            kdd = 15;
             ld = kdd*u(1);
             tp_max = ld+0.2;
             tp_min = ld-0.2;

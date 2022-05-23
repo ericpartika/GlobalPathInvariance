@@ -50,7 +50,7 @@ end
 x4 = steering_angle;
 x5 = 0;
 x6 = 0;
-vel = 120;
+vel = 160;
 
 x0 = [x1;x2;x3;x4;x5;x6]
 
@@ -81,7 +81,7 @@ x6_Old = x6;
 v_input_Old = v_input;
 xi1_old = 0;
 
-lowpass_gain = 0.3;
+lowpass_gain = 0.2;
 
 %% Contol Loop
 for i=1:length(T)
@@ -97,8 +97,8 @@ for i=1:length(T)
     if(x3m < 0)
         x3m = x3m + 2*pi;
     end
-    x1 = x1_Old*lowpass_gain + (1-lowpass_gain)*x1m;
-    x2 = x2_Old*lowpass_gain + (1-lowpass_gain)*x2m;
+    x1 = x1_Old*lowpass_gain + (1-lowpass_gain)*x1m
+    x2 = x2_Old*lowpass_gain + (1-lowpass_gain)*x2m
     x3 = x3_Old*lowpass_gain + (1-lowpass_gain)*x3m;
     x4 = steering_angle;
 
@@ -159,18 +159,18 @@ for i=1:length(T)
 
     % Send Controls
     if(i>50)
-        vel = 90;
+        vel = 100;
     end
     %     input = [round(steering_angle*180/pi)+40, 120-(v_input*20)];
     input = [round(steering_angle*180/pi)+40, vel];
-    write(udp, input, 'uint8', '192.168.2.104', 10002);
+    write(udp, input, 'uint8', '192.168.2.101', 10002);
 
     % Loop at 5ms
     pause(dt);
    end
 
 % stop car
-write(udp, [40,0], 'uint8', '192.168.2.104', 10002);
+write(udp, [40,0], 'uint8', '192.168.2.101', 10002);
 
 %% Plotting
 
