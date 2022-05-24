@@ -8,13 +8,15 @@ close all
 v = 0.1; %%% Not the linear velocity input but the fixed speed
 k_int = 1;
 
-k1 = 3; %
+k1 = 6; %
 k2 = 45;
 k3 = 45;%
 k4 = 10;
 k5 =  10;
+lowpass_gain = 0.5;
+
 L=0.27;
-r=1.5; %% radius of the circle to follow
+r=1.7; %% radius of the circle to follow
 
 
 %% Instantiate client object to run Motive API commands
@@ -55,7 +57,7 @@ vel = 120;
 x0 = [x1;x2;x3;x4;x5;x6]
 
 % Simulation time
-Tmax = 10;  % End point
+Tmax = 13;  % End point
 dt =0.05; % Time step
 T = 0:dt:Tmax; % Time vector
 
@@ -79,6 +81,7 @@ x4_Old = x4;
 x5_Old = x5;
 x6_Old = x6;
 v_input_Old = v_input;
+steeringAngle_Old = steering_angle;
 xi1_old = 0;
 
 % path generation
@@ -148,8 +151,8 @@ for i=1:length(T)
                 end
 
                 % Send Controls
-                if(i>50)
-                    vel = 110;
+                if(i>20)
+                    vel = 120;
                 end
                 %     input = [round(steering_angle*180/pi)+40, 120-(v_input*20)];
                 input = [round(steering_angle*180/pi)+40, vel];
@@ -212,14 +215,17 @@ for i=1:length(T)
         x6 = x6 + u2*dt;
         x5 = x5 + dt*x6;
         v_input = x5 + v;
-        steering_angle = 1*steering_angle + u1*dt;
+        steering_anglem = 1*steering_angle + u1*dt;
 
         % saturate +- 20deg
-        if(steering_angle < -0.35)
-            steering_angle = -0.35;
-        elseif(steering_angle > 0.35)
-            steering_angle = 0.35;
+        if(steering_anglem < -0.35)
+            steering_anglem = -0.35;
+        elseif(steering_anglem > 0.35)
+            steering_anglem = 0.35;
         end
+        
+        steeringAngle_Old = steering_angle;
+        steering_angle = steeringAngle_Old*lowpass_gain + (1-lowpass_gain)*steering_anglem;
 
         % saving state for plots
         u1_plot(i) = u1;
@@ -230,7 +236,7 @@ for i=1:length(T)
 
         % Send Controls
         if(i>50)
-            vel = 110;
+            vel = 100;
         end
         %     input = [round(steering_angle*180/pi)+40, 120-(v_input*20)];
         input = [round(steering_angle*180/pi)+40, vel];

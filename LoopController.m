@@ -70,6 +70,7 @@ eta2_plot = zeros(1,length(T));
 eta3_plot = zeros(1,length(T));
 u1_plot = zeros(1,length(T));
 u2_plot = zeros(1,length(T));
+steeringangle_plot = zeros(1,length(T));
 
 %%% Giving values to the individual componets for the ease of coding
 x1_Old = x1;
@@ -151,6 +152,7 @@ for i=1:length(T)
     end
 
     % saving state for plots
+    steeringangle_plot(i) = steering_angle;
     u1_plot(i) = u1;
     u2_plot(i) = u2;
     x = [x1;x2;x3;x4;x5;x6];
@@ -159,7 +161,7 @@ for i=1:length(T)
 
     % Send Controls
     if(i>50)
-        vel = 100;
+        vel = 150;
     end
     %     input = [round(steering_angle*180/pi)+40, 120-(v_input*20)];
     input = [round(steering_angle*180/pi)+40, vel];
