@@ -8,7 +8,7 @@ close all
 v = 0.1; %%% Not the linear velocity input but the fixed speed
 k_int = 1;
 
-k1 = 6; %
+k1 = 8; %
 k2 = 45;
 k3 = 45;%
 k4 = 10;
@@ -72,6 +72,8 @@ eta2_plot = zeros(1,length(T));
 eta3_plot = zeros(1,length(T));
 u1_plot = zeros(1,length(T));
 u2_plot = zeros(1,length(T));
+ang = zeros(1,length(T));
+delta = 0;
 
 %%% Giving values to the individual componets for the ease of coding
 x1_Old = x1;
@@ -85,7 +87,7 @@ steeringAngle_Old = steering_angle;
 xi1_old = 0;
 
 % path generation
-load('motionplanCircle2.mat');
+load('motionplan.mat');
 xpath = motionplan(3,:);
 ypath = motionplan(4,:);
 
@@ -168,6 +170,7 @@ for i=1:length(T)
 
         end
         x_all(:,i+1) = x;
+        ang(i) = steering_angle;
 
     else
         if(switchpoint == 0)
@@ -233,6 +236,7 @@ for i=1:length(T)
         x = [x1;x2;x3;x4;x5;x6];
         xi1_old = xi1;
         x_all(:,i) = x;
+        ang(i) = steering_angle;
 
         % Send Controls
         if(i>50)
@@ -263,7 +267,7 @@ lambda = -pi:0.01:pi;
 plot(r*cos(lambda),r*sin(lambda), 'r--','color','green', 'linewidth',4);
 plot(x_all(1,1:switchpoint), x_all(2,1:switchpoint), 'r','color','red','linewidth',2);
 plot(x_all(1,switchpoint:end), x_all(2,switchpoint:end), 'r','color','blue','linewidth',2);
-title('Unicycle Following circle with different initial conditions')
+title('Hybrid Controller')
 xlabel('x_{1}')
 ylabel('x_{2}')
 U = [1,0,0.2,0.2;
@@ -278,6 +282,20 @@ grid on;
 axis equal
 legend('Generated Trajectory', 'Path to follow', 'kappa1', 'kappa0')
 hold off;
+
+figure(2)
+subplot(4,1,1)
+plot(T, x_all(1,:));
+ylabel('x')
+subplot(4,1,2)
+plot(T, x_all(2,:))
+ylabel('y')
+subplot(4,1,3)
+plot(T, x_all(3,:)*(180/pi));
+ylabel('\theta')
+subplot(4,1,4)
+plot(T, ang*(180/pi))
+ylabel('\delta')
 
 figure(3);
 plot(T,xi1_plot,T,xi2_plot,T,xi3_plot)
