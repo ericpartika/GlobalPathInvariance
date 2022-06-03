@@ -57,7 +57,7 @@ vel = 120;
 x0 = [x1;x2;x3;x4;x5;x6]
 
 % Simulation time
-Tmax = 13;  % End point
+Tmax = 20;  % End point
 dt =0.05; % Time step
 T = 0:dt:Tmax; % Time vector
 
@@ -272,10 +272,12 @@ xlabel('x_{1}')
 ylabel('x_{2}')
 U = [1,0,0.2,0.2;
     -0.5,0.5,0.2,0.2;
-    0.2,0.6,0.2,0.2];
+    0.2,0.6,0.2,0.2
+    2.5, 0, 0.5, 0.5];
 rectangle('Position',U(1,:),'FaceColor',[1 0 0])
 rectangle('Position',U(2,:),'FaceColor',[1 0 0])
 rectangle('Position',U(3,:),'FaceColor',[1 0 0])
+rectangle('Position',U(4,:),'FaceColor',[1 0 0])
 %%% displaying the initial marker
 plot(x0(1), x0(2), 'bo', 'MarkerSize', 10, 'MarkerFaceColor', 'red');
 grid on;
@@ -304,25 +306,27 @@ xlabel('t(sec)')
 ylabel('position on the set \Gamma^{*}')
 grid on;
 legend('\xi_1','\xi_2','\xi_3')
+% 
+% figure(4);
+% plot(T,u1_plot)
+% title('u_1 versus time');
+% xlabel('t(sec)')
+% ylabel('Magnitude of the control input')
+% grid on;
+% legend('u_1')
+% 
+% figure(5);
+% plot(T,u2_plot)
+% title('u_2 versus time');
+% xlabel('t(sec)')
+% ylabel('Magnitude of the control input')
+% grid on;
+% legend('u_2')
 
-figure(4);
-plot(T,u1_plot)
-title('u_1 versus time');
-xlabel('t(sec)')
-ylabel('Magnitude of the control input')
-grid on;
-legend('u_1')
 
-figure(5);
-plot(T,u2_plot)
-title('u_2 versus time');
-xlabel('t(sec)')
-ylabel('Magnitude of the control input')
-grid on;
-legend('u_2')
 
 date = datestr(now, 'dd_mm_yy_HH_MM');
 
-% save(['Logs/',date, '.mat'], 'i', 'k1', 'k2', 'k3', 'x_all', 'u1_plot', 'u2_plot', 'dt', 'eta1_plot', 'eta2_plot', 'eta3_plot')
+save(['Logs/',date, '.mat'], 'i', 'k1', 'k2', 'k3', 'x_all', 'u1_plot', 'u2_plot', 'dt', 'eta1_plot', 'eta2_plot', 'eta3_plot')
 
 
