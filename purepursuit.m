@@ -5,10 +5,14 @@ close all
 %%% s curve
 t = 0:0.01:10;
 rad = 50;
-xpath = t;
-a = 2;
-k = 1;
-ypath = 4 - (5*(1./(1+exp(-k.*(xpath-a)))));
+% xpath = t;
+% a = 2;
+% k = 1;
+% ypath = 4 - (5*(1./(1+exp(-k.*(xpath-a)))));
+
+load('motionplanCircle.mat');
+xpath = motionplan(3,:);
+ypath = motionplan(4,:);
 
 %%% sine wave
 % th = 0:pi/100:10*pi;
@@ -25,24 +29,24 @@ hold off
 
 u = [0.1, 0]'; % u = (v, omega)
 
-z = [0, 0, 0, 0;
-     0, 4, deg2rad(0), 0]'; % z = (x, y, theta, zeta)
+z = [0, 0, pi, 0;
+     0, 0, pi, 0]'; % z = (x, y, theta, zeta)
 
 L = 0.3;
 lr = L/2;
 
 Kp = 0.7;
-dt = 0.01;
+dt = 0.1;
 
 
 %% controls
 
-for j = 1:length(xpath)
+for j = 1:200
     % find closest tp in range
-    kdd = 15;
+    kdd = 10;
     ld = kdd*u(1);
-    tp_max = ld+0.5;
-    tp_min = ld-0.5;
+    tp_max = ld+0.2;
+    tp_min = ld-0.2;
     min = ld+1;
     xg = 0;
     yg = 0;
@@ -57,6 +61,9 @@ for j = 1:length(xpath)
         %     a = atan2(ypath(i) - bwy,xpath(i) -bwx);
         if(d<tp_max) && (d>tp_min)
             a =  z(3, end)  - atan2((ypath(i) - bwy),(xpath(i) - bwx));
+            if(a > pi)
+                a = a-2*pi;
+            end
             if (a < pi/2) && (a > -pi/2) && (d<min)
                 min = d;
                 xg = xpath(i);

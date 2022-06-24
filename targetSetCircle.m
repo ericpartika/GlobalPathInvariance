@@ -1,14 +1,14 @@
-function [bool] = targetSet(x)
+function [bool] = targetSetCircle(x)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 x1 = x(1); % x
 x2 = x(2); % y
-x3 = x(3); % theta
+x3 = mod(x(3), 2*pi); % theta
 x4 = x(4); % delta
 
 % adjust these thresholds to expand target set
-threshhold = 0.05; %5cm
-angleThreshhold = 0.2 %approx 12deg
+threshhold = 0.3; %5cm
+angleThreshhold = pi/2;%approx 12deg
 
 load('targetSet.mat');
 
